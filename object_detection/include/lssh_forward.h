@@ -33,33 +33,33 @@ extern "C"
 #include "lssh.h"
 
     /**
-     * @brief Get the min_face, score_threshold, nms_threshold and shape of input image
+     * @brief Get the min_face, score_threshold, nms_threshold and shape of input image.
      * 
-     * @param min_face 
-     * @param score_threshold 
-     * @param nms_threshold 
-     * @param image_height      Input image height
-     * @param image_width       Input image width
-     * @return lssh_config_t 
+     * @param min_face            The minimun face that can be detected
+     * @param score_threshold     Score threshold， used to filter candidates by score
+     * @param nms_threshold       NMS threshold， used to filter out overlapping boxes
+     * @param image_height        Input image height
+     * @param image_width         Input image width
+     * @return lssh_config_t      Lssh configuration
      */
     lssh_config_t lssh_get_config(fptp_t min_face, fptp_t score_threshold, fptp_t nms_threshold, int image_height, int image_width);
 
     /**
-     * @brief Update config once the input image shape is changeed
+     * @brief Update config once the input image shape is changeed.
      * 
-     * @param config 
-     * @param min_face 
-     * @param image_height 
-     * @param image_width 
+     * @param config              Original configuration
+     * @param min_face            The minimun face that can be detected
+     * @param image_height        Input image height
+     * @param image_width         Input image width
      */
     void lssh_update_config(lssh_config_t *config, fptp_t min_face, int image_height, int image_width);
 
     /**
-     * @brief 
+     * @brief Do lssh forward to detect object.
      * 
-     * @param image         Input image
-     * @param config        
-     * @return box_array_t* 
+     * @param image            Input image
+     * @param config           Lssh configuration
+     * @return box_array_t*    The detection result 
      */
     box_array_t *lssh_detect_object(dl_matrix3du_t *image, lssh_config_t config);
 

@@ -59,4 +59,28 @@ menu "ESP-FACE Configuration"
 
     endmenu
 
+    menu "Pose Estimation"
+    
+        choice HAND_DETECTION_MODEL
+            bool "Hand Detection Model"
+            default HD_NANO1
+
+            config HD_NANO1
+                bool "HAND DETECTION NANO1"
+            config HD_LITE1
+                bool "HAND DETECTION LITE1"
+        endchoice
+
+        choice HAND_POSE_ESTIMATION_MODEL
+            bool "Hand Pose Estimation Model"
+            default HP_NANO1
+
+            config HP_NANO1
+                bool "HAND POSE_ESTIMATION NANO1"
+            config HP_LITE1
+                bool "HAND POSE_ESTIMATION LITE1"
+        endchoice
+
+    endmenu
+
 endmenu
