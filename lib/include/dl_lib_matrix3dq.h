@@ -641,6 +641,7 @@ dl_matrix3dq_t *dl_matrix3duq_depthwise_conv_3x3(dl_matrix3du_t *in,
  * @param stride_x  Stride of width
  * @param stride_y  Stride of height
  * @param padding   Padding type, 0: valid, 1: same
+ * @param relu      ReLU, 0: don't, 1: do
  * @param exponent  Exponent for resulting matrix
  * @param name      Layer name to debug
  * @return          Resulting quantized matrix
@@ -650,6 +651,7 @@ dl_matrix3dq_t *dl_matrix3dqq_depthwise_conv_3x3(dl_matrix3dq_t *in,
                                                  int stride_x,
                                                  int stride_y,
                                                  dl_padding_type padding,
+                                                 int relu,
                                                  int exponent,
                                                  char *name);
 

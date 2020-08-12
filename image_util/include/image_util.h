@@ -43,42 +43,44 @@ extern "C"
 
     typedef enum
     {
-        BINARY,           /*!< binary */  
+        BINARY, /*!< binary */
     } en_threshold_mode;
+
     typedef struct
     {
-        fptp_t landmark_p[LANDMARKS_NUM];   /*!< landmark struct */
+        fptp_t landmark_p[LANDMARKS_NUM]; /*!< landmark struct */
     } landmark_t;
 
     typedef struct
     {
-        fptp_t box_p[4];      /*!< box struct */
+        fptp_t box_p[4]; /*!< box struct */
     } box_t;
 
     typedef struct tag_box_list
     {
-        fptp_t *score;               /*!< The confidence score of the class corresponding to the box */
-        box_t *box;                  /*!< Anchor boxes or predicted boxes*/
-        landmark_t *landmark;        /*!< The landmarks corresponding to the box */
-        int len;                     /*!< The num of the boxes */
+        uint8_t *category;    /*!< The category of the corresponding box */
+        fptp_t *score;        /*!< The confidence score of the class corresponding to the box */
+        box_t *box;           /*!< Anchor boxes or predicted boxes*/
+        landmark_t *landmark; /*!< The landmarks corresponding to the box */
+        int len;              /*!< The num of the boxes */
     } box_array_t;
 
     typedef struct tag_image_box
     {
-        struct tag_image_box *next;   /*!< Next image_box_t */
-        fptp_t score;                 /*!< The confidence score of the class corresponding to the box */
-        box_t box;                    /*!< Anchor boxes or predicted boxes */
-        box_t offset;                 /*!< The predicted anchor-based offset */
-        landmark_t landmark;          /*!< The landmarks corresponding to the box */
+        struct tag_image_box *next; /*!< Next image_box_t */
+        uint8_t category;
+        fptp_t score;        /*!< The confidence score of the class corresponding to the box */
+        box_t box;           /*!< Anchor boxes or predicted boxes */
+        box_t offset;        /*!< The predicted anchor-based offset */
+        landmark_t landmark; /*!< The landmarks corresponding to the box */
     } image_box_t;
 
     typedef struct tag_image_list
     {
-        image_box_t *head;            /*!< The current head of the image_list */
-        image_box_t *origin_head;     /*!< The original head of the image_list */
-        int len;                       /*!< Length of the image_list */
+        image_box_t *head;        /*!< The current head of the image_list */
+        image_box_t *origin_head; /*!< The original head of the image_list */
+        int len;                  /*!< Length of the image_list */
     } image_list_t;
-
 
     /**
      * @brief Get the width and height of the box.
@@ -93,7 +95,6 @@ extern "C"
         *h = box->box_p[3] - box->box_p[1] + 1;
     }
 
-
     /**
      * @brief Get the area of the box.
      * 
@@ -106,7 +107,6 @@ extern "C"
         image_get_width_and_height(box, &w, &h);
         *area = w * h;
     }
-
 
     /**
      * @brief calibrate the boxes by offset
@@ -206,7 +206,6 @@ extern "C"
         }
     }
 
-
     /**@{*/
     /**
      * @brief Convert RGB565 image to RGB888 image
@@ -217,9 +216,9 @@ extern "C"
     static inline void rgb565_to_888(uint16_t in, uint8_t *dst)
     { /*{{{*/
         in = (in & 0xFF) << 8 | (in & 0xFF00) >> 8;
-        dst[0] = (in & RGB565_MASK_BLUE) << 3;  // blue
+        dst[2] = (in & RGB565_MASK_BLUE) << 3;  // blue
         dst[1] = (in & RGB565_MASK_GREEN) >> 3; // green
-        dst[2] = (in & RGB565_MASK_RED) >> 8;   // red
+        dst[0] = (in & RGB565_MASK_RED) >> 8;   // red
 
         // dst[0] = (in & 0x1F00) >> 5;
         // dst[1] = ((in & 0x7) << 5) | ((in & 0xE000) >> 11);
@@ -229,9 +228,9 @@ extern "C"
     static inline void rgb565_to_888_q16(uint16_t in, int16_t *dst)
     { /*{{{*/
         in = (in & 0xFF) << 8 | (in & 0xFF00) >> 8;
-        dst[0] = (in & RGB565_MASK_BLUE) << 3;  // blue
+        dst[2] = (in & RGB565_MASK_BLUE) << 3;  // blue
         dst[1] = (in & RGB565_MASK_GREEN) >> 3; // green
-        dst[2] = (in & RGB565_MASK_RED) >> 8;   // red
+        dst[0] = (in & RGB565_MASK_RED) >> 8;   // red
 
         // dst[0] = (in & 0x1F00) >> 5;
         // dst[1] = ((in & 0x7) << 5) | ((in & 0xE000) >> 11);
@@ -257,7 +256,6 @@ extern "C"
         *in = rgb565;
     } /*}}}*/
 
-    
     /**
      * @brief Filter out the resulting boxes whose confidence score is lower than the threshold and convert the boxes to the actual boxes on the original image.((x, y, w, h) -> (x1, y1, x2, y2))
      * 
@@ -333,7 +331,7 @@ extern "C"
      * @param dst_c        Channel of the output image
      * @param src_w        Width of the source image
      * @param src_h        Height of the source image
-     */ 
+     */
     void image_resize_linear(uint8_t *dst_image, uint8_t *src_image, int dst_w, int dst_h, int dst_c, int src_w, int src_h);
 
     /**
@@ -419,9 +417,9 @@ extern "C"
     typedef float matrixType;
     typedef struct
     {
-        int w;                  /*!< width */ 
-        int h;                  /*!< height */ 
-        matrixType **array;     /*!< array */
+        int w;              /*!< width */
+        int h;              /*!< height */
+        matrixType **array; /*!< array */
     } Matrix;
 
     /**
@@ -439,7 +437,7 @@ extern "C"
      * @param m    2d matrix 
      */
     void matrix_free(Matrix *m);
-    
+
     /**
      * @brief Get the similarity matrix of similarity transformation
      * 
@@ -471,9 +469,7 @@ extern "C"
      * @param M             Affine transformation matrix
      */
     void warp_affine(dl_matrix3du_t *img, dl_matrix3du_t *crop, Matrix *M);
-    
 
-    
     /**
      * @brief Resize the image in RGB888 format via bilinear interpolation, and quantify the output image
      * 
@@ -500,7 +496,6 @@ extern "C"
      * @return dl_matrix3dq_t*      The resulting preprocessed image.
      */
     dl_matrix3dq_t *image_resize_normalize_quantize(uint8_t *image, int input_w, int input_h, int target_size, int exponent, int process_mode);
-    
 
     /**
      * @brief Resize the image in RGB565 format via mean neighbour interpolation, and quantify the output image
@@ -516,7 +511,7 @@ extern "C"
      * @param shift             Shift parameter of quantization.
      */
     void image_resize_shift_fast(qtp_t *dimage, uint16_t *simage, int dw, int dc, int sw, int sh, int tw, int th, int shift);
-    
+
     /**
      * @brief Resize the image in RGB565 format via nearest neighbour interpolation, and quantify the output image
      * 
@@ -531,7 +526,7 @@ extern "C"
      * @param shift             Shift parameter of quantization.
      */
     void image_resize_nearest_shift(qtp_t *dimage, uint16_t *simage, int dw, int dc, int sw, int sh, int tw, int th, int shift);
-    
+
     /**
      * @brief Crop the image in RGB565 format and resize it to target size, then quantify the output image 
      * 
@@ -547,7 +542,6 @@ extern "C"
      * @param shift             Shift parameter of quantization.
      */
     void image_crop_shift_fast(qtp_t *dimage, uint16_t *simage, int dw, int sw, int sh, int x1, int y1, int x2, int y2, int shift);
-
 
 #ifdef __cplusplus
 }

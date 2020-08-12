@@ -1,23 +1,47 @@
-# LSSH
+# Object Detection
 
-[TOC]
 
-LSSH is a lite one stage Object detection model, which is built around [a new mobile architecture called MobileNetV2](https://arxiv.org/abs/1801.04381) and [SSH: Single Stage Headless Face Detector](https://arxiv.org/abs/1708.03979), and is specially designed for embedded devices.
+
+**Object Detection** is a lite one stage object detection library specially designed for embedded devices.
+
+
+
+## Quick Start
+
+Here is a pseudocode of how to achieve object detection by our library.
+
+```c
+// Here we take cat-face-detection as an example.
+// Initialize/Update model configuration
+update_detection_model(&cat_face_3, 0.5, 0.6, 0.3, image_height, image_width); 	// Call this when initialization and parameter changed
+
+// Do detection
+box_array_t *net_boxes = detect_object(image, &cat_face_3); 
+```
+
+The details of APIs could be seen in '**API Introduction**'.
+
+The available detection models could be seen in '**Detection Model Market**'.
+
+
 
 ## API Introduction
 
 ```c
-lssh_config_t lssh_initialize_config(fptp_t min_face, fptp_t score_threshold, fptp_t nms_threshold, int image_height, int image_width);
+void update_detection_model(detection_model_t *model, fptp_t resize_scale, fptp_t score_threshold, fptp_t nms_threshold, int image_height, int image_width);
 ```
 
-This `lssh_initialize_config()` helps to set and return a **configuration** of LSSH.
+This update_detection_model()` helps to update model configuration.
 
 The inputs are:
 
-- **min_face**:
+- **model**:
+  - a detection model,
+  - please see **Model Selection** below for more details.
+- **resize_scale**:
+  - Input image resize in this scale
   - Range: [16, the length of the shortest edge of the original input image). 
-  - For an original input image of a fixed size, the smaller the `min_face` is, 
-    - the larger the number of generated images of different sizes is;
+  - For an original input image of a fixed size, the larger the `resize_scale` is, 
     - the smaller the minimum size of a detectable face is;
     - the longer the processing takes
   - and vice versa.
@@ -36,22 +60,18 @@ The inputs are:
 - **image_height**: the height of original input image.
 - **image_width**: the width of original input image.
 
-The output is:
-
-- A `lssh_config_t` type value which is the configuration of LSSH.
-
 
 
 ```c
-box_array_t *lssh_detect_object(dl_matrix3du_t *image, lssh_config_t config);
+box_array_t *detect_object(dl_matrix3du_t *image, detection_model_t *model);
 ```
 
-This `lssh_detect_object()` handles the whole object detection mission.
+This `detect_object()` handles the whole object detection mission.
 
 The inputs are:
 
 - **image**: an image in `dl_matrix3du_t` type
-- **config**: the configuration of LSSH. 
+- **model**: a detection model. 
 
 The output is:
 
@@ -62,6 +82,7 @@ This structure is defined as follows:
 ```c
 typedef struct tag_box_list
 {
+    uint8_t *category;
     fptp_t *score;
     box_t *box;
     landmark_t *landmark;
@@ -73,46 +94,11 @@ The structure contains heads of arrays, each array has a same length, which is t
 
 
 
-```c
-void lssh_update_image_shape(lssh_config_t *config, int image_height, int image_width);
-```
+## Detection Model Market
 
-This `lssh_update_image_shape()` is called before `lssh_detect_object` , when the shape of input image is changeable.
+All available models are included in `./object_detection/include/object_detection.h`. Here are the descriptions.
 
-The inputs are:
+| model            | function        | root                       |
+| ---------------- | --------------- | -------------------------- |
+| cat_face_3_model | detect cat face | ./lib/include/cat_face_3.h |
 
-- **config**: the point to configuration of LSSH.
-- **image_height**: the height of original input image.
-- **image_width**: the width of original input image.
-
-
-
-## Model Selection
-
-Here is only one optional model by now:
-
-- LSSH SPARSE MN 5
-
-
-
-### Performance
-
-We evaluated all models with the same configuration and our own test set. The results are shown below.
-
-```c
-lssh_config = lssh_initialize_config(80, 0.6, 0.3, 240, 320);
-```
-
-|                  | Average Time Consumption (ms)(without/with landmark) |
-| :--------------: | :--------------------------------------------------: |
-| LSSH SPARSE MN 5 |                        99/105                        |
-
-
-
-### How to select
-
-Models can be selected through `idf.py menuconfig` or `make menuconfig`. Select <u>Component config</u> >> <u>ESP-FACE Configuration</u> >> <u>Object Detection</u> sequentially, you'll see options below.
-
-![LSSH KConfig](../img/lssh_kconfig.png)
-
-Also, **With landmark** could be selected to enable the landmark output.

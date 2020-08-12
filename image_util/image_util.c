@@ -1890,7 +1890,7 @@ void image_resize_shift_fast(qtp_t *dimage, uint16_t *simage, int dw, int dc, in
 
 void image_resize_nearest_shift(qtp_t *dimage, uint16_t *simage, int dw, int dc, int sw, int sh, int tw, int th, int shift)
 {
-    assert(shift>=2);
+    assert(shift>=0);
     assert(dc == 3);
     int shift_real = shift - 2;
     float ratio_w = (float)sw / tw;
@@ -1907,9 +1907,9 @@ void image_resize_nearest_shift(qtp_t *dimage, uint16_t *simage, int dw, int dc,
             int di = (_di + dxi) * dc;
             int si0 = rintf(_si0 + dxi * ratio_w);
             rgb565_to_888_q16(simage[si0], dst);
-            dimage[di] = ((int16_t)(dst[0]) << shift_real);
-            dimage[di+1] = ((int16_t)(dst[1]) << shift_real);
-            dimage[di+2] = ((int16_t)(dst[2]) << shift_real);
+            dimage[di] = ((int16_t)(dst[0]) << shift);
+            dimage[di+1] = ((int16_t)(dst[1]) << shift);
+            dimage[di+2] = ((int16_t)(dst[2]) << shift);
         }
     }
     return;
