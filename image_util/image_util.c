@@ -1892,7 +1892,6 @@ void image_resize_nearest_shift(qtp_t *dimage, uint16_t *simage, int dw, int dc,
 {
     assert(shift>=0);
     assert(dc == 3);
-    int shift_real = shift - 2;
     float ratio_w = (float)sw / tw;
     float ratio_h = (float)sh / th;
     int16_t dst[3];
