@@ -260,7 +260,7 @@ box_array_t *detect_object(dl_matrix3du_t *image, detection_model_t *model)
 
     // filter by score
     image_list_t **origin_head = (image_list_t **)dl_lib_calloc(model->model_config.enabled_top_k, sizeof(image_list_t *), 0);
-    image_list_t all_box_list = {NULL};
+    image_list_t all_box_list = {NULL, NULL, 0};
     for (size_t i = 0; i < model->model_config.enabled_top_k; i++)
     {
         origin_head[i] = (image_list_t *)model->get_boxes(stage_result, &model->model_config, model->stage_config, i);
